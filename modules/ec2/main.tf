@@ -2,7 +2,7 @@ resource "aws_instance" "this" {
   count = local.instance_count
 
   ami                         = local.ami
-  instance_type               = var.instance_type
+  instance_type               = local.instance_type
   subnet_id                   = local.subnet_id
   vpc_security_group_ids      = var.vpc_security_group_ids
   key_name                    = local.key_name

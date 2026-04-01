@@ -19,4 +19,5 @@ locals {
   associate_public_ip_address = try(var.associate_public_ip_address, false)
   user_data                   = try(var.user_data, null)
   subnet_id                   = try(var.subnet_id, null)
+  instance_type               = coalesce(var.instance_type, "t3.micro")
 }

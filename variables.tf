@@ -19,6 +19,12 @@ variable "instance_names" {
   default     = ["web-1"]
 }
 
+variable "instance_type" {
+  description = "The type of instance to start"
+  type        = string
+  default     = "t3.micro"
+}
+
 variable "ami" {
   description = "The AMI to use for the instances. If not provided, a default will be used."
   type        = string

@@ -1,5 +1,5 @@
 output "instance_ids" {
-  value = [for i in module.ec2 : i.instance_id]
+  value = [for i in module.ec2 : i.id]
 }
 
 output "public_ips" {

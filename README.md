@@ -1,38 +1,32 @@
-# Terraform AWS EC2 Module
+# Terraform AWS EC2 Module Wrapper
 
-This module provisions an AWS EC2 instance with configurable networking, security groups, and tagging. It is designed to be reusable and easily integrated with VPC and security group modules.
+This repository provides a production-ready wrapper for the AWS EC2 Terraform module. It allows for dynamic provisioning of multiple EC2 instances across different environments with standardized naming and tagging.
 
 ---
 
 ## 🚀 Features
 
-* Launch EC2 instances with customizable AMI and instance type
-* Attach to specific subnet and security groups
-* Optional key pair support for SSH access
-* Supports public or private instance deployment
-* Environment-based tagging
+* **Dynamic Instance Creation**: Provision one or many instances using `instance_names`.
+* **Environment-Based Logic**: Automatically adjusts instance types and tags based on the `environment` (dev, staging, prod).
+* **Flexible Naming**: Standardized naming convention: `${env}-${name}`.
+* **Optional Toggle**: Enable or disable instance creation using `create_instances`.
+* **Dynamic Tagging**: Combines global tags with environment-specific and resource-specific tags.
 
 ---
 
 ## 📦 Usage
 
 ```hcl
-provider "aws" {
-  region = "ap-south-1"
-}
+module "ec2_wrapper" {
+  source = "./"
 
-module "ec2" {
-  source = "aaditya-2905/ec2/aws"
-
-  ami                         = "ami-xxxxxxxx"
-  instance_type               = "t2.micro"
-  subnet_id                   = "subnet-xxxxxxxx"
-  vpc_security_group_ids      = ["sg-xxxxxxxx"]
-  key_name                    = "my-key"
-  associate_public_ip_address = true
-
+  environment    = "dev"
+  subnet_id      = "subnet-xxxxxxxx"
+  sg_id          = "sg-xxxxxxxx"
+  instance_names = ["web-server", "app-server"]
+  
   tags = {
-    Environment = "dev"
+    Owner = "platform-team"
   }
 }
 ```
@@ -41,39 +35,30 @@ module "ec2" {
 
 ## 📥 Inputs
 
-| Name                        | Description                | Type         | Required |
-| --------------------------- | -------------------------- | ------------ | -------- |
-| ami                         | AMI ID for the instance    | string       | ✅        |
-| instance_type               | EC2 instance type          | string       | ✅        |
-| subnet_id                   | Subnet ID                  | string       | ✅        |
-| vpc_security_group_ids      | List of security group IDs | list(string) | ✅        |
-| key_name                    | Key pair name              | string       | ❌        |
-| associate_public_ip_address | Assign public IP           | bool         | ❌        |
-| tags                        | Tags to apply to resources | map(string)  | ❌        |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| environment | Environment name (dev, staging, prod) | `string` | n/a | ✅ |
+| subnet_id | The VPC Subnet ID to launch in | `string` | n/a | ✅ |
+| sg_id | Security group ID for the instances | `string` | n/a | ✅ |
+| instance_names | List of names for the instances to create | `list(string)` | `["web-1"]` | ❌ |
+| ami | The AMI to use for the instances. If not provided, a default will be used. | `string` | `null` | ❌ |
+| create_instances | Whether to create the instances | `bool` | `true` | ❌ |
+| tags | Additional tags for all resources | `map(string)` | `{}` | ❌ |
 
 ---
 
 ## 📤 Outputs
 
-| Name        | Description            |
-| ----------- | ---------------------- |
-| instance_id | ID of the EC2 instance |
-| public_ip   | Public IP of instance  |
-| private_ip  | Private IP of instance |
+| Name | Description |
+|------|-------------|
+| instance_ids | List of IDs of the created EC2 instances |
+| public_ips | List of public IP addresses assigned to the instances |
 
 ---
 
-## 🧠 Notes
+## 📂 Module Structure
 
-* Ensure the subnet and security group belong to the same VPC
-* Public IP will only be assigned if subnet supports it
-* Use private subnets for secure workloads
-
----
-
-## 🔗 Example
-
-See the `examples/basic` directory for a working example.
+The core logic resides in the `modules/ec2` directory, which is designed to be a standalone, registry-compatible module.
 
 ---
 
